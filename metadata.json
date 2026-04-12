@@ -1,5 +1,5 @@
 {
   "name": "füd",
   "description": "A food-tech e-commerce marketplace connecting college students with local home chefs for affordable, home-cooked meals.",
-  "requestFramePermissions": []
+  "requestFramePermissions": ["camera"]
 }

@@ -5,7 +5,7 @@ import { MealList } from './components/MealList';
 import { CartDrawer } from './components/CartDrawer';
 import { CheckoutPage } from './components/CheckoutPage';
 import { CookDashboardMockup } from './components/CookDashboardMockup';
-import { Meal } from './data/meals';
+import { sampleMeals, Meal } from './data/meals';
 import { CartItem } from './types';
 
 export default function App() {
@@ -13,6 +13,7 @@ export default function App() {
   const [selectedUniversity, setSelectedUniversity] = useState<string>('');
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [meals, setMeals] = useState<Meal[]>(sampleMeals);
 
   const handleAddToCart = (meal: Meal) => {
     setCartItems(prev => {
@@ -37,6 +38,22 @@ export default function App() {
     }).filter(item => item.quantity > 0));
   };
 
+  const handleAddMeal = (newMealData: Omit<Meal, 'id' | 'chefName' | 'rating' | 'reviews'>) => {
+    const newMeal: Meal = {
+      ...newMealData,
+      id: `m${meals.length + 1}`,
+      chefName: 'Maria (You)',
+      rating: 0,
+      reviews: 0,
+    };
+    setMeals(prev => [newMeal, ...prev]);
+    setCurrentPage('home'); // Optional: redirect to home to see the new meal, or stay on dashboard
+  };
+
+  const handleRemoveMeal = (mealId: string) => {
+    setMeals(prev => prev.filter(meal => meal.id !== mealId));
+  };
+
   const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
@@ -55,7 +72,7 @@ export default function App() {
               onSelectUniversity={setSelectedUniversity} 
             />
             {selectedUniversity === 'RV University' && (
-              <MealList onAddToCart={handleAddToCart} />
+              <MealList meals={meals} onAddToCart={handleAddToCart} />
             )}
           </>
         )}
@@ -69,7 +86,12 @@ export default function App() {
         )}
 
         {currentPage === 'dashboard' && (
-          <CookDashboardMockup onBack={() => setCurrentPage('home')} />
+          <CookDashboardMockup 
+            meals={meals}
+            onBack={() => setCurrentPage('home')} 
+            onAddMeal={handleAddMeal}
+            onRemoveMeal={handleRemoveMeal}
+          />
         )}
       </main>
 
