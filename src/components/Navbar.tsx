@@ -39,10 +39,6 @@ export function Navbar({ cartItemCount, onOpenCart, onNavigate }: NavbarProps) {
 
           {/* Right side icons */}
           <div className="flex items-center space-x-4">
-            <button className="p-2 text-gray-600 hover:text-orange-500 transition-colors md:hidden">
-              <Search size={24} />
-            </button>
-            
             <button 
               className="p-2 text-gray-600 hover:text-orange-500 transition-colors relative"
               onClick={onOpenCart}

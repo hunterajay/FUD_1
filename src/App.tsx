@@ -10,6 +10,7 @@ import { CartItem } from './types';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<'home' | 'checkout' | 'dashboard'>('home');
+  const [selectedUniversity, setSelectedUniversity] = useState<string>('');
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
@@ -49,8 +50,13 @@ export default function App() {
       <main>
         {currentPage === 'home' && (
           <>
-            <Hero />
-            <MealList onAddToCart={handleAddToCart} />
+            <Hero 
+              selectedUniversity={selectedUniversity} 
+              onSelectUniversity={setSelectedUniversity} 
+            />
+            {selectedUniversity === 'RV University' && (
+              <MealList onAddToCart={handleAddToCart} />
+            )}
           </>
         )}
         

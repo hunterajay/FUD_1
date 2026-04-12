@@ -1,7 +1,12 @@
 import React from 'react';
-import { Search, MapPin } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 
-export function Hero() {
+interface HeroProps {
+  selectedUniversity: string;
+  onSelectUniversity: (university: string) => void;
+}
+
+export function Hero({ selectedUniversity, onSelectUniversity }: HeroProps) {
   return (
     <div className="bg-[#FFD8B1] py-16 sm:py-24 px-4 sm:px-6 lg:px-8 text-center rounded-b-[2.5rem] shadow-sm mb-12">
       <div className="max-w-3xl mx-auto">
@@ -14,26 +19,17 @@ export function Hero() {
         </p>
         
         <div className="max-w-xl mx-auto bg-white rounded-full shadow-md p-2 flex items-center border border-orange-100 focus-within:ring-2 focus-within:ring-orange-400 focus-within:border-transparent transition-all">
-          <div className="flex-1 flex items-center px-4 border-r border-gray-200">
-            <Search className="text-gray-400 mr-2" size={20} />
-            <input 
-              type="text" 
-              placeholder="What are you craving?" 
-              className="w-full py-2 outline-none text-gray-700 placeholder-gray-400 bg-transparent"
-            />
+          <div className="flex-1 flex items-center px-4">
+            <MapPin className="text-orange-500 mr-2" size={20} />
+            <select 
+              value={selectedUniversity}
+              onChange={(e) => onSelectUniversity(e.target.value)}
+              className="w-full py-3 outline-none text-gray-700 bg-transparent cursor-pointer appearance-none font-medium"
+            >
+              <option value="" disabled>Select your university...</option>
+              <option value="RV University">RV University</option>
+            </select>
           </div>
-          <div className="hidden sm:flex flex-1 items-center px-4">
-            <MapPin className="text-gray-400 mr-2" size={20} />
-            <input 
-              type="text" 
-              placeholder="Campus or Zip" 
-              className="w-full py-2 outline-none text-gray-700 placeholder-gray-400 bg-transparent"
-              defaultValue="University Campus"
-            />
-          </div>
-          <button className="bg-orange-500 hover:bg-orange-600 text-white rounded-full px-6 py-3 font-semibold transition-colors">
-            Find Food
-          </button>
         </div>
         
         <div className="mt-8 flex flex-wrap justify-center gap-3">
