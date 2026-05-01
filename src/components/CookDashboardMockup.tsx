@@ -1,20 +1,24 @@
 import React, { useState } from 'react';
 import { ArrowLeft, TrendingUp, Users, IndianRupee, Package, Plus, X, Camera, Trash2 } from 'lucide-react';
 import { Meal } from '../data/meals';
+import { Order, OrderStatus } from '../types';
 
 interface CookDashboardProps {
   meals: Meal[];
+  orders: Order[];
   onBack: () => void;
   onAddMeal: (meal: Omit<Meal, 'id' | 'chefName' | 'rating' | 'reviews'>) => void;
   onRemoveMeal: (id: string) => void;
+  onUpdateOrderStatus: (id: string, status: OrderStatus) => void;
 }
 
-export function CookDashboardMockup({ meals, onBack, onAddMeal, onRemoveMeal }: CookDashboardProps) {
+export function CookDashboardMockup({ meals, orders, onBack, onAddMeal, onRemoveMeal, onUpdateOrderStatus }: CookDashboardProps) {
   const [isAddingMeal, setIsAddingMeal] = useState(false);
   const [newMeal, setNewMeal] = useState({
     name: '',
     description: '',
     price: '',
+    portions: '',
     image: '',
     tags: ''
   });
@@ -25,11 +29,12 @@ export function CookDashboardMockup({ meals, onBack, onAddMeal, onRemoveMeal }: 
       name: newMeal.name,
       description: newMeal.description,
       price: Number(newMeal.price),
+      portions: Number(newMeal.portions) || 0,
       imageUrl: newMeal.image || '/image1.jpg',
       tags: newMeal.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
     });
     setIsAddingMeal(false);
-    setNewMeal({ name: '', description: '', price: '', image: '', tags: '' });
+    setNewMeal({ name: '', description: '', price: '', portions: '', image: '', tags: '' });
   };
 
   const handleImageCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,6 +49,21 @@ export function CookDashboardMockup({ meals, onBack, onAddMeal, onRemoveMeal }: 
   };
 
   const myMeals = meals.filter(meal => meal.chefName === 'Maria (You)');
+
+  const cycleOrderStatus = (order: Order) => {
+    let nextStatus: OrderStatus = 'Preparing';
+    if (order.status === 'Pending') nextStatus = 'Preparing';
+    if (order.status === 'Preparing') nextStatus = 'In Transit';
+    if (order.status === 'In Transit') nextStatus = 'Completed';
+    onUpdateOrderStatus(order.id, nextStatus);
+  };
+
+  const earnedToday = orders.filter(o => o.status === 'Completed').reduce((sum, o) => sum + o.total, 0);
+  const activeOrdersCount = orders.filter(o => o.status !== 'Completed').length;
+  // Calculate unique customers count simply from orders list
+  const totalCustomers = new Set(orders.map(o => o.customer)).size + 42; // mock starting base
+  // Profile Views can be mock + some relationship to orders
+  const profileViews = orders.length * 10 + 324;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -92,9 +112,13 @@ export function CookDashboardMockup({ meals, onBack, onAddMeal, onRemoveMeal }: 
                   <input required type="number" min="0" value={newMeal.price} onChange={e => setNewMeal({...newMeal, price: e.target.value})} className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-400 outline-none" placeholder="150" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Dietary Tags</label>
-                  <input type="text" value={newMeal.tags} onChange={e => setNewMeal({...newMeal, tags: e.target.value})} className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-400 outline-none" placeholder="Spicy, Halal" />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Portions (Stock)</label>
+                  <input required type="number" min="1" value={newMeal.portions} onChange={e => setNewMeal({...newMeal, portions: e.target.value})} className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-400 outline-none" placeholder="10" />
                 </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Dietary Tags</label>
+                <input type="text" value={newMeal.tags} onChange={e => setNewMeal({...newMeal, tags: e.target.value})} className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-400 outline-none" placeholder="Spicy, Halal" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Meal Image</label>
@@ -137,10 +161,10 @@ export function CookDashboardMockup({ meals, onBack, onAddMeal, onRemoveMeal }: 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {[
-          { label: 'Total Earnings', value: '₹12,405', icon: IndianRupee, trend: '+12%' },
-          { label: 'Active Orders', value: '8', icon: Package, trend: 'Needs prep' },
-          { label: 'Total Customers', value: '142', icon: Users, trend: '+5 this week' },
-          { label: 'Profile Views', value: '890', icon: TrendingUp, trend: '+24%' },
+          { label: 'Total Earnings', value: `₹${earnedToday.toLocaleString()}`, icon: IndianRupee, trend: '+12%' },
+          { label: 'Active Orders', value: activeOrdersCount.toString(), icon: Package, trend: 'Needs prep' },
+          { label: 'Total Customers', value: totalCustomers.toString(), icon: Users, trend: 'Growing steadily' },
+          { label: 'Profile Views', value: profileViews.toString(), icon: TrendingUp, trend: 'High visibility' },
         ].map((stat, i) => (
           <div key={i} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
             <div className="flex justify-between items-start mb-4">
@@ -170,7 +194,7 @@ export function CookDashboardMockup({ meals, onBack, onAddMeal, onRemoveMeal }: 
                   <img src={meal.imageUrl} alt={meal.name} className="w-16 h-16 rounded-lg object-cover border border-gray-100" />
                   <div>
                     <h3 className="font-bold text-gray-900">{meal.name}</h3>
-                    <p className="text-sm text-gray-500">₹{meal.price.toFixed(0)}</p>
+                    <p className="text-sm text-gray-500">₹{meal.price.toFixed(0)} • {meal.portions} portions left</p>
                   </div>
                 </div>
                 <button 
@@ -193,17 +217,14 @@ export function CookDashboardMockup({ meals, onBack, onAddMeal, onRemoveMeal }: 
           <button className="text-sm font-medium text-orange-500 hover:text-orange-600">View All</button>
         </div>
         <div className="divide-y divide-gray-100">
-          {[
-            { id: '#ORD-001', item: "Mama's Classic Lasagna (x2)", customer: "Alex J.", time: "Pickup in 45m", status: "Preparing" },
-            { id: '#ORD-002', item: "Vegan Power Buddha Bowl", customer: "Sam T.", time: "Pickup in 1h", status: "Pending" },
-            { id: '#ORD-003', item: "Homestyle Mac & Cheese", customer: "Jordan L.", time: "Delivered", status: "Completed" },
-          ].map((order, i) => (
+          {orders.map((order, i) => (
             <div key={i} className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <div className="flex items-center gap-3 mb-1">
                   <span className="font-bold text-gray-900">{order.id}</span>
                   <span className={`text-xs font-medium px-2 py-1 rounded-full ${
                     order.status === 'Preparing' ? 'bg-blue-50 text-blue-600' :
+                    order.status === 'In Transit' ? 'bg-purple-50 text-purple-600' :
                     order.status === 'Pending' ? 'bg-yellow-50 text-yellow-600' :
                     'bg-green-50 text-green-600'
                   }`}>
@@ -214,7 +235,10 @@ export function CookDashboardMockup({ meals, onBack, onAddMeal, onRemoveMeal }: 
                 <p className="text-sm text-gray-500 mt-1">For {order.customer} • {order.time}</p>
               </div>
               {order.status !== 'Completed' && (
-                <button className="px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 text-sm font-medium rounded-lg transition-colors border border-gray-200">
+                <button 
+                  onClick={() => cycleOrderStatus(order)}
+                  className="px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 text-sm font-medium rounded-lg transition-colors border border-gray-200"
+                >
                   Update Status
                 </button>
               )}

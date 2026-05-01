@@ -4,10 +4,14 @@ import { Star, Plus } from 'lucide-react';
 
 interface MealCardProps {
   meal: Meal;
+  cartQuantity: number;
   onAddToCart: (meal: Meal) => void;
 }
 
-export function MealCard({ meal, onAddToCart }: MealCardProps) {
+export const MealCard: React.FC<MealCardProps> = ({ meal, cartQuantity, onAddToCart }) => {
+  const remainingPortions = meal.portions - cartQuantity;
+  const isOutOfStock = remainingPortions <= 0;
+
   return (
     <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-orange-100 flex flex-col h-full group">
       <div className="relative h-48 overflow-hidden">
@@ -28,7 +32,12 @@ export function MealCard({ meal, onAddToCart }: MealCardProps) {
           <span className="text-lg font-extrabold text-orange-600">₹{meal.price.toFixed(0)}</span>
         </div>
         
-        <p className="text-sm text-gray-500 mb-3">by <span className="font-medium text-gray-700">{meal.chefName}</span></p>
+        <div className="flex justify-between items-center mb-3">
+          <p className="text-sm text-gray-500">by <span className="font-medium text-gray-700">{meal.chefName}</span></p>
+          <span className={`text-xs font-semibold px-2 py-1 rounded-full ${isOutOfStock ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}>
+            {isOutOfStock ? 'Out of Stock' : `${remainingPortions} portions left`}
+          </span>
+        </div>
         
         <p className="text-sm text-gray-600 mb-4 line-clamp-2 flex-grow">{meal.description}</p>
         
@@ -42,10 +51,15 @@ export function MealCard({ meal, onAddToCart }: MealCardProps) {
         
         <button 
           onClick={() => onAddToCart(meal)}
-          className="w-full py-2.5 bg-orange-100 hover:bg-orange-500 text-orange-700 hover:text-white rounded-xl font-semibold transition-colors flex items-center justify-center gap-2"
+          disabled={isOutOfStock}
+          className={`w-full py-2.5 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2 ${
+            isOutOfStock 
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+              : 'bg-orange-100 hover:bg-orange-500 text-orange-700 hover:text-white'
+          }`}
         >
           <Plus size={18} />
-          Add to Order
+          {isOutOfStock ? 'Out of Stock' : 'Add to Order'}
         </button>
       </div>
     </div>

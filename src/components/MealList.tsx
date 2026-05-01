@@ -1,13 +1,15 @@
 import React from 'react';
 import { MealCard } from './MealCard';
 import { Meal } from '../data/meals';
+import { CartItem } from '../types';
 
 interface MealListProps {
   meals: Meal[];
+  cartItems: CartItem[];
   onAddToCart: (meal: Meal) => void;
 }
 
-export function MealList({ meals, onAddToCart }: MealListProps) {
+export function MealList({ meals, cartItems, onAddToCart }: MealListProps) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
       <div className="flex justify-between items-end mb-8">
@@ -27,7 +29,12 @@ export function MealList({ meals, onAddToCart }: MealListProps) {
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {meals.map(meal => (
-          <MealCard key={meal.id} meal={meal} onAddToCart={onAddToCart} />
+          <MealCard 
+            key={meal.id} 
+            meal={meal} 
+            cartQuantity={cartItems.find(item => item.meal.id === meal.id)?.quantity || 0}
+            onAddToCart={onAddToCart} 
+          />
         ))}
       </div>
     </div>

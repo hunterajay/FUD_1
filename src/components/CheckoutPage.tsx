@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { CartItem } from '../types';
+import { CartItem, Order } from '../types';
 import { ArrowLeft, CreditCard, ExternalLink, CheckCircle } from 'lucide-react';
 
 interface CheckoutPageProps {
   cartItems: CartItem[];
   onBack: () => void;
-  onClearCart: () => void;
+  onOrderComplete: (orderData: Omit<Order, 'id' | 'status' | 'time'>) => void;
 }
 
-export function CheckoutPage({ cartItems, onBack, onClearCart }: CheckoutPageProps) {
+export function CheckoutPage({ cartItems, onBack, onOrderComplete }: CheckoutPageProps) {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const subtotal = cartItems.reduce((sum, item) => sum + (item.meal.price * item.quantity), 0);
@@ -78,7 +78,11 @@ export function CheckoutPage({ cartItems, onBack, onClearCart }: CheckoutPagePro
     } finally {
       setIsSubmitting(false);
       setIsSubmitted(true);
-      onClearCart();
+      onOrderComplete({
+        customer: (formData.get('firstName') as string) || 'Guest',
+        item: cartItems.map(item => `${item.meal.name} (x${item.quantity})`).join(', '),
+        total: total
+      });
     }
   };
 

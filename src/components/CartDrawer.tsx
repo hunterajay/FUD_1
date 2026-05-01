@@ -82,7 +82,8 @@ export function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantity, onChe
                         <span className="w-8 text-center font-medium text-sm">{item.quantity}</span>
                         <button 
                           onClick={() => onUpdateQuantity(item.meal.id, 1)}
-                          className="p-1 text-gray-500 hover:text-orange-500 transition-colors"
+                          disabled={item.quantity >= item.meal.portions}
+                          className={`p-1 transition-colors ${item.quantity >= item.meal.portions ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:text-orange-500'}`}
                         >
                           <Plus size={16} />
                         </button>

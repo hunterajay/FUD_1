@@ -8,6 +8,7 @@ export interface Meal {
   reviews: number;
   tags: string[];
   imageUrl: string;
+  portions: number;
 }
 
 export const sampleMeals: Meal[] = [
@@ -20,7 +21,8 @@ export const sampleMeals: Meal[] = [
     rating: 4.9,
     reviews: 124,
     tags: ["Italian", "Comfort Food", "Contains Dairy"],
-    imageUrl: "/image1.jpg"
+    imageUrl: "/image1.jpg",
+    portions: 5
   },
   {
     id: '2',
@@ -31,7 +33,8 @@ export const sampleMeals: Meal[] = [
     rating: 4.8,
     reviews: 89,
     tags: ["Thai", "Spicy", "Dairy-Free"],
-    imageUrl: "/image2.jpg"
+    imageUrl: "/image2.jpg",
+    portions: 12
   },
   {
     id: '3',
@@ -42,7 +45,8 @@ export const sampleMeals: Meal[] = [
     rating: 4.7,
     reviews: 56,
     tags: ["Healthy", "spicy"],
-    imageUrl: "/image3.jpg"
+    imageUrl: "/image3.jpg",
+    portions: 8
   },
   {
     id: '4',
@@ -53,7 +57,8 @@ export const sampleMeals: Meal[] = [
     rating: 5.0,
     reviews: 210,
     tags: ["Indian", "Halal", "Spicy"],
-    imageUrl: "/image4.jpg"
+    imageUrl: "/image4.jpg",
+    portions: 0
   },
   {
     id: '5',
@@ -64,6 +69,7 @@ export const sampleMeals: Meal[] = [
     rating: 4.6,
     reviews: 42,
     tags: ["Vegetarian", "Comfort Food"],
-    imageUrl: "/image5.jpg"
+    imageUrl: "/image5.jpg",
+    portions: 15
   }
 ];
